@@ -1,15 +1,21 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
+from device.models import UserPublicKey
 
 
 # first we define the serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['username']
 
 
-class GroupSerializer(serializers.ModelSerializer):
+class ModelKeyPairSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Group
-        fields = '__all__'
+        model = UserPublicKey
+        fields = ['public_key']
+
+
+class KeyPairSerializer(serializers.Serializer):
+    public_key = serializers.ReadOnlyField()
+    private_key = serializers.ReadOnlyField()
