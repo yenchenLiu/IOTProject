@@ -23,6 +23,9 @@ class UserViewSet(GenericViewSet):
 
     @list_route(methods=["get"])
     def get_username(self, request, *args, **kwargs):
+        """
+            登入後查詢自己的username
+        """
         queryset = self.request.user
         serializer = self.get_serializer(queryset, many=False)
         return Response(serializer.data)
@@ -35,6 +38,9 @@ class KeyPairViewSet(GenericViewSet):
 
     @list_route(methods=["get"])
     def generate_private_key(self, request, *args, **kwargs):
+        """
+            第一次產生金鑰
+        """
         queryset = self.filter_queryset(self.get_queryset())
         if queryset.filter(user=self.request.user).exists():
             if "force" not in kwargs:
@@ -50,6 +56,9 @@ class KeyPairViewSet(GenericViewSet):
 
     @list_route(methods=["get"])
     def regenerate_private_key(self, request, *args, **kwargs):
+        """
+            重新產生金鑰
+        """
         queryset = self.filter_queryset(self.get_queryset())
         try:
             key_model = queryset.get(user=self.request.user)
@@ -66,7 +75,8 @@ class KeyPairViewSet(GenericViewSet):
     @list_route(methods=["post"])
     def get_public_key(self, request):
         """
-            post: POST username 可取得使用者的公鑰
+            使用username 查詢公鑰
+            POST username 可取得使用者的公鑰
         """
         queryset = self.filter_queryset(self.get_queryset())
         if "username" not in request.data:
