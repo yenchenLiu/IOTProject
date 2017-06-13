@@ -17,10 +17,12 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from device.docs import schema_view
 from device import urls as device_urls
+from maprunner import urls as maprunner_urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^auth/', include('rest_framework_social_oauth2.urls')),
     url(r'^device/', include(device_urls, namespace="device")),
+    url(r'^maprunner/', include(maprunner_urls, namespace="map_runner")),
     url(r'^docs/', schema_view),
 ]
