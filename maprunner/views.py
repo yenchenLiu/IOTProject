@@ -1,6 +1,7 @@
+from math import radians, cos, sin, asin, sqrt
+
 from django.shortcuts import render
 
-from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, TokenHasScope
 # from .permissions import TokenHasReadWriteScope, TokenHasScope
 from rest_framework import mixins
 from rest_framework import permissions, viewsets
@@ -54,7 +55,30 @@ class MapSiteViewSet(GenericViewSet,
         queryset = queryset.exclude(user=self.request.user)
         lat = float(request.data["lat"])
         long = float(request.data["long"])
-        queryset = queryset.filter(latitude__range=(lat-0.1, lat+0.1), longitude__range=(long-0.1, long+0.1))
+        queryset = queryset.filter(latitude__range=(lat-0.01, lat+0.01), longitude__range=(long-0.01, long+0.01))
+
+        exclude_site_id = []
+        for item in queryset:
+            if MapSiteViewSet._haversine(item.longitude, item.latitude, long, lat) > 0.1:
+                exclude_site_id.append(item.id)
+        queryset = queryset.exclude(id__in=exclude_site_id)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @staticmethod
+    def _haversine(lon1, lat1, lon2, lat2):
+        """
+        Calculate the great circle distance between two points
+        on the earth (specified in decimal degrees)
+        """
+        # convert decimal degrees to radians
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+        # haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        c = 2 * asin(sqrt(a))
+        r = 6371  # Radius of earth in kilometers. Use 3956 for miles
+        return c * r
