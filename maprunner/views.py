@@ -59,7 +59,7 @@ class MapSiteViewSet(GenericViewSet,
 
         exclude_site_id = []
         for item in queryset:
-            if MapSiteViewSet._haversine(item.longitude, item.latitude, long, lat) > 0.1:
+            if MapSiteViewSet._haversine(item.longitude, item.latitude, long, lat) > 0.5:
                 exclude_site_id.append(item.id)
         queryset = queryset.exclude(id__in=exclude_site_id)
 
